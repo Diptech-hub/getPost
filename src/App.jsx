@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 function App() {
   const [values, setValues] = useState([]);
+  const [input, setInput] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -25,15 +25,22 @@ function App() {
     })();
   }, []);
 
-  const handleEdit = (valueId, updatedTitle) => {
-    // axios.put(`https://jsonplaceholder.typicode.com/posts/${valueId}`, { title: updatedTitle })
-    //   .then(response => {
-    //     console.log(response.data);
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
-    
+  const handleEdit = (valueId) => {
+    setValues((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === valueId ? { ...post, isEditing: !post.isEditing } : post
+      )
+    );
+  };
+
+  const handleEditChange = (e, valueId) => {
+    setInput(e.target.value);
+
+    setValues((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === valueId ? { ...post, title: e.target.value } : post
+      )
+    );
   };
 
   const handleDelete = (valueId) => {
@@ -42,12 +49,21 @@ function App() {
 
   return (
     <div>
-      {values.map(value => (
-        <div key={value.id}>
-          <h2>{value.title}</h2>
-          <p>{value.body}</p>
-          <button onClick={() => handleEdit(value.id, 'Updated Title')}>Edit</button>
-          <button onClick={() => handleDelete(value.id)}>Delete</button>
+      {values.map((post) => (
+        <div style={{ border: '1px dashed', marginBottom: '5px' }} key={post.id}>
+          {post.isEditing ? (
+            <input
+              type="text"
+              value={post.title}
+              onChange={(e) => handleEditChange(e, post.id)}
+            />
+          ) : (
+            post.title
+          )}
+          <button onClick={() => handleEdit(post.id)}>
+            {post.isEditing ? 'Save' : 'Edit'}
+          </button>
+          <button onClick={() => handleDelete(post.id)}>Delete</button>
         </div>
       ))}
     </div>
