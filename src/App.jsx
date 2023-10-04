@@ -5,33 +5,39 @@ function App() {
   const [values, setValues] = useState([]);
 
   useEffect(() => {
-    axios.get('https://jsonplaceholder.typicode.com/posts')
-      .then(response => {
-        setValues(response.data);
-      })
-      .catch(error => {
+    (async () => {
+      try {
+        const response = await fetch(
+          'https://jsonplaceholder.typicode.com/todos?limit=5'
+        );
+
+        const data = await response.json();
+
+        const updatedPosts = data.map((post) => ({
+          ...post,
+          isEditing: false,
+        }));
+
+        setValues(updatedPosts);
+      } catch (error) {
         console.log(error);
-      });
+      }
+    })();
   }, []);
 
   const handleEdit = (valueId, updatedTitle) => {
-    axios.put(`https://jsonplaceholder.typicode.com/posts/${valueId}`, { title: updatedTitle })
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    // axios.put(`https://jsonplaceholder.typicode.com/posts/${valueId}`, { title: updatedTitle })
+    //   .then(response => {
+    //     console.log(response.data);
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
+    
   };
 
   const handleDelete = (valueId) => {
-    axios.delete(`https://jsonplaceholder.typicode.com/posts/${valueId}`)
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    setValues((prevPosts) => prevPosts.filter((post) => post.id !== valueId));
   };
 
   return (
